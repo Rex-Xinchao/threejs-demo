@@ -1,24 +1,24 @@
 <template>
   <div id="app">
-    <Test msg="Welcome to Your Vue.js App"/>
+    <Chart />
   </div>
 </template>
 
 <script>
-// import HelloWorld from './components/HelloWorld.vue'
-import Test from './components/test_now2.vue'
+import Chart from './components/chart.vue'
 
 export default {
   name: 'App',
   components: {
-    // HelloWorld,
-    Test
+    Chart
   }
 }
 </script>
 
 <style>
-#app, html, body {
+#app,
+html,
+body {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
