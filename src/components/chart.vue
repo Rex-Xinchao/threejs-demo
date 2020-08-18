@@ -9,6 +9,7 @@ import * as THREE from 'three'
 // import * as TWEEN from 'tween'
 import calc from '../mixins/calc'
 import mouseEvent from '../mixins/mouseEvent'
+import forShow from '../mixins/forShow'
 
 export default {
   name: 'HelloWorld',
@@ -29,10 +30,11 @@ export default {
       minDistance: 250, // z轴最远距离
       maxDistance: 0, // z轴最远距离
       initFinished: false, // 是否完成绘图
-      maxLevel: 3
+      maxLevel: 3,
+      nodes: []
     }
   },
-  mixins: [calc, mouseEvent],
+  mixins: [calc, mouseEvent, forShow],
   props: {
     msg: String
   },
@@ -62,9 +64,11 @@ export default {
       }
       this.maxDistance = z
       // 指定相机位置，深度为中间层的位置
-      this.camera.position.set(0, 0, this.maxDistance / 2)
+      this.createTestNode(this.maxDistance / 2)
+      this.camera.position.set(0, 0, this.maxDistance / 2 + 250)
     },
     async initDom(nodes) {
+      this.nodes = this.nodes.concat(nodes)
       nodes.forEach(node => {
         const radius = node.radius
         const geometry = new THREE.CircleGeometry(radius, 100)
@@ -88,7 +92,10 @@ export default {
       links.forEach(link => {
         const target = link.target
         const source = link.source
-        points.push(new THREE.Vector3(target.x, target.y, target.z))
+        let len = Math.floor(Math.sqrt((Math.pow(target.x - source.x, 2) + Math.pow(target.y - source.y, 2))))
+        let x = target.x - (target.radius / len) * (target.x - source.x)
+        let y = target.y - (target.radius / len) * (target.y - source.y)
+        points.push(new THREE.Vector3(x, y, target.z))
         points.push(new THREE.Vector3(source.x, source.y, source.z))
       })
       const material = new THREE.LineBasicMaterial({ color: 'white' })

@@ -60,11 +60,13 @@ export default {
       console.log(intersects)
 
       //将所有的相交的模型的颜色设置为红色，如果只需要将第一个触发事件，那就数组的第一个模型改变颜色即可
-      this.scene.children.forEach(item => {
+      this.scene.children.forEach((item) => {
         item.material.color.set('white')
       })
       for (let i = 0; i < intersects.length; i++) {
-        intersects[i].object.material.color.set(0xff0000)
+        if (intersects[i].object.type !== 'Line') {
+          intersects[i].object.material.color.set(0xff0000)
+        }
       }
     }
 

@@ -42,7 +42,7 @@ export default {
     },
     init_z(index, z) {
       let num = 0
-      index = index & 4
+      index = index % 4
       if (index === 0) {
         num = ((Math.random() * this.space) / 8) * -1 + z - this.space / 8
       } else if (index === 1) {
@@ -61,7 +61,7 @@ export default {
       let id = null
       switch (i) {
         case 1:
-          id = '新能源汽车'
+          id = '汽车'
           break
         case 2:
           id = '农业'
