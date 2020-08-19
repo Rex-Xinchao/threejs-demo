@@ -88,20 +88,24 @@ export default {
       })
     },
     initLine(links) {
-      let points = []
       links.forEach(link => {
+        let points = []
         const target = link.target
         const source = link.source
-        let len = Math.floor(Math.sqrt((Math.pow(target.x - source.x, 2) + Math.pow(target.y - source.y, 2))))
-        let x = target.x - (target.radius / len) * (target.x - source.x)
-        let y = target.y - (target.radius / len) * (target.y - source.y)
-        points.push(new THREE.Vector3(x, y, target.z))
-        points.push(new THREE.Vector3(source.x, source.y, source.z))
+        let len = Math.floor(Math.sqrt(Math.pow(target.x - source.x, 2) + Math.pow(target.y - source.y, 2)))
+        let x1 = target.x - (target.radius / len) * (target.x - source.x)
+        let y1 = target.y - (target.radius / len) * (target.y - source.y)
+        let x2 = source.x
+        // let x2 = source.x - (source.radius / len) * (source.x - target.x)
+        let y2 = source.y
+        // let y2 = source.y - (source.radius / len) * (source.y - target.y)
+        points.push(new THREE.Vector3(x1, y1, target.z))
+        points.push(new THREE.Vector3(x2, y2, source.z))
+        const material = new THREE.LineBasicMaterial({ color: 'white' })
+        const geometry = new THREE.BufferGeometry().setFromPoints(points)
+        const line = new THREE.Line(geometry, material)
+        this.scene.add(line)
       })
-      const material = new THREE.LineBasicMaterial({ color: 'white' })
-      const geometry = new THREE.BufferGeometry().setFromPoints(points)
-      const line = new THREE.Line(geometry, material)
-      this.scene.add(line)
       this.renderer.render(this.scene, this.camera)
     },
     animate() {

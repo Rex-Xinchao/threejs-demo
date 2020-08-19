@@ -1,6 +1,9 @@
 export default {
   data() {
-    return {}
+    return {
+      showNode: [],
+      showLink: []
+    }
   },
   methods: {
     createTestNode(dis) {
@@ -9,59 +12,100 @@ export default {
         x: 0,
         y: 0,
         z: dis,
-        radius: 6
+        radius: 6,
+        level: 1,
+        type: null
       }
-      let { list, links } = this.createTNearbyNode(node)
-      this.initLine(links)
-      this.initDom(list)
+      this.showNode = [node]
+      this.createTNearbyNode(node, 3)
+      this.initLine(this.showLink)
+      this.initDom(this.showNode)
     },
-    createTNearbyNode(node) {
-      let list = [node]
-      let links = []
-      let number = 3
+    createTNearbyNode(node, number = 0) {
       for (let i = 0; i < number; i++) {
-        let node_t = {
-          id: '测试节点_' + i,
-          x: this.initNearby_x(i, node.x),
-          y: this.initNearby_y(i, node.y),
-          z: this.initNearby_z(i, node.z),
-          radius: Math.ceil(Math.random() * (this.nodeRadius_max - 2)) + 2
+        let node_t = this.getRandomPosition(i, node)
+        this.showNode.push(node_t)
+        this.showLink.push({ target: node_t, source: node })
+        if ((i === 0 && node_t.level === 2) || (i === 1 && node_t.level === 3)) {
+          this.createTNearbyNode(node_t, 2)
         }
-        list.push(node_t)
-        links.push({
-          target: node_t,
-          source: node
-        })
+        if (i === 1 && node_t.level === 2) {
+          this.createTNearbyNode(node_t, 3)
+        }
+        if (i === 2 && node_t.level === 2) {
+          this.createTNearbyNode(node_t, 1)
+        }
       }
-      return { list: list, links: links }
     },
-    initNearby_x(index, x) {
-      let num = 0
-      index = index % 4
-      if (index == 0 || index === 2) {
-        num = Math.random() * -35 + x - 30
-      } else {
-        num = Math.random() * 35 + x + 30
+    getRandomPosition(i, node) {
+      let type = node.type
+      if (!type) {
+        let typeList = [
+          ['top', 'left'],
+          ['top', 'right'],
+          ['bottom', 'right'],
+          ['bottm', 'left']
+        ]
+        type = typeList[i % 4]
+      } else if (type.join('') === 'topleft') {
+        let typeList = [
+          ['top', 'left'],
+          ['top', 'right'],
+          ['bottom', 'left']
+        ]
+        type = typeList[i % 3]
+      } else if (type.join('') === 'topright') {
+        let typeList = [
+          ['top', 'right'],
+          ['top', 'left'],
+          ['bottom', 'right']
+        ]
+        type = typeList[i % 3]
+      } else if (type.join('') === 'bottomright') {
+        let typeList = [
+          ['bottom', 'right'],
+          ['right', 'left'],
+          ['top', 'left']
+        ]
+        type = typeList[i % 3]
+      } else if (type.join('') === 'bottomleft') {
+        let typeList = [['bottom', 'bottom'], ['bottom', 'right'], [('top', 'bottom')]]
+        type = typeList[i % 3]
       }
-      return Math.floor(num)
+      let y = this[`init${type[0]}`](node.y)
+      let x = this[`init${type[1]}`](node.x)
+      let z = this.initNearby_z(i, node.z)
+      let radius = Math.ceil(Math.random() * (this.nodeRadius_max - 2)) + 2
+      let level = node.level + 1
+      return {
+        id: `${level}_${i}`,
+        x: x,
+        y: y,
+        z: z,
+        radius: radius,
+        level: level,
+        type: type
+      }
     },
-    initNearby_y(index, y) {
-      let num = 0
-      index = index % 4
-      if (index < 2) {
-        num = Math.random() * 30 + y + 30
-      } else {
-        num = Math.random() * -30 + y - 30
-      }
-      return Math.floor(num)
+    initleft(x) {
+      return Math.floor(Math.random() * -80 + x - 15)
+    },
+    initright(x) {
+      return Math.floor(Math.random() * 80 + x + 15)
+    },
+    inittop(y) {
+      return Math.floor(Math.random() * 60 + y + 5)
+    },
+    initbottom(y) {
+      return Math.floor(Math.random() * -60 + y - 5)
     },
     initNearby_z(index, z) {
       let num = 0
       index = index % 2
       if (index === 0) {
-        num = ((Math.random() * this.space) / 16) * -1 + z
+        num = Math.random() * 100 + z
       } else {
-        num = z
+        num = Math.random() * -350 + z
       }
       return Math.floor(num)
     }
